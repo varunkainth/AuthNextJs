@@ -9,13 +9,13 @@ connect();
 export async function POST(req: NextRequest) {
   try {
     const reqbody = await req.json();
-    const { username, email, password } =  reqbody;
-    console.log(reqbody);
+    const { username, email, password } = reqbody;
+    // console.log(reqbody);
 
     const user = await User.findOne({ email });
     if (user) {
       return NextResponse.json(
-        { Error: "User Already exist .... " },
+        { Error: "User Already exist .... ", data: user },
         { status: 400 }
       );
     }
@@ -39,11 +39,10 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-        message:"User Registered Successfully",
-        success:true,
-        data:savedUser
-    })
-
+      message: "User Registered Successfully",
+      success: true,
+      data: savedUser,
+    });
   } catch (error: any) {
     return NextResponse.json(
       {
