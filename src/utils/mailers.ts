@@ -9,7 +9,6 @@ export const sendemail = async ({ email, emailType, userId }: any) => {
 
     switch (emailType) {
       case "welcome":
-        
         subject = "Welcome to Our Platform!";
         html = `
         <!DOCTYPE html>
@@ -34,10 +33,14 @@ export const sendemail = async ({ email, emailType, userId }: any) => {
       `;
         break;
       case "verification":
-        await User.findByIdAndUpdate(userId, {
+        await User.findByIdAndUpdate(
+          userId,
+          {
             verifytoken: token,
             verifytokenexpiry: Date.now() + 3600000,
-          },{new:true});
+          },
+          { new: true }
+        );
         subject = "Account Verification";
         action = "verify your account";
         html = `
@@ -64,10 +67,14 @@ export const sendemail = async ({ email, emailType, userId }: any) => {
       `;
         break;
       case "resetPassword":
-        await User.findByIdAndUpdate(userId, {
+        await User.findByIdAndUpdate(
+          userId,
+          {
             forgetpasswordtoken: token,
             forgetpasswordtokenexpiry: Date.now() + 3600000,
-          },{new:true});
+          },
+          { new: true }
+        );
         subject = "Password Reset";
         action = "reset your password";
         html = `
