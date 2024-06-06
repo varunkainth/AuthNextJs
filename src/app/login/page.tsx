@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/utils/cn";
@@ -9,12 +9,71 @@ import {
   IconBrandGoogle,
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const LoginPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted");
   };
+
+  const router = useRouter();
+  const [user, setuser] = useState({
+    userCred: "",
+    password: "",
+    confirmpassword: "",
+  });
+
+  const [passwordError, setpasswordError] = useState(false);
+  const [Type, setType] = useState(true);
+  const [buttonDisabled, setbuttonDisabled] = useState(false);
+  const [loading, setloading] = useState(false);
+
+  const login = async () => {
+    try {
+      setloading(true);
+      const res = await axios.post("/api/v1/users/login", user);
+      console.log("Login Successfully ", res);
+      toast.success("Login Sucessfully");
+      router.push("/profile");
+    } catch (error: any) {
+      toast.error("Login Failed");
+      toast.error(error.message);
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (
+      user.password === user.confirmpassword &&
+      user.confirmpassword.length === user.password.length
+    ) {
+      setpasswordError(false);
+    } else {
+      setpasswordError(true);
+    }
+  }, [user.password]);
+
+  useEffect(() => {
+    if (
+      user.userCred.length > 0 &&
+      user.password.length > 0 &&
+      user.confirmpassword.length > 0
+    ) {
+      setbuttonDisabled(false);
+    } else {
+      setbuttonDisabled(true);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user.userCred.includes("@")) {
+      setType(true);
+    } else {
+      setType(false);
+    }
+  }, [user.userCred]);
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
@@ -23,6 +82,12 @@ const LoginPage: React.FC = () => {
       </h2>
       <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
         Login to Auth NextJs
+      </p>
+      {"\n"}
+      {"\n"}
+      <p className="text-3xl">{loading ? "Processing....." : ""}</p>
+      <p className="text-3xl">
+        {passwordError ? "Password must be same...." : ""}
       </p>
 
       <form className="my-8" onSubmit={handleSubmit}>
@@ -37,27 +102,49 @@ const LoginPage: React.FC = () => {
           </LabelInputContainer>
         </div> */}
         <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Username</Label>
-          <Input id="email" placeholder="username" type="text" />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder="yourmail@address.com" type="email" />
+          <Label htmlFor={Type ? "email" : "username"}>
+            Email Address or Username
+          </Label>
+          <Input
+            id="email"
+            placeholder="yourmail@address.com or Username"
+            type={Type ? "email" : "text"}
+            value={user.userCred}
+            onChange={(e) => setuser({ ...user, userCred: e.target.value })}
+          />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder="••••••••" type="password" minLength={6} />
+          <Input
+            id="password"
+            placeholder="••••••••"
+            type="password"
+            minLength={6}
+            value={user.password}
+            onChange={(e) => setuser({ ...user, password: e.target.value })}
+          />
         </LabelInputContainer>
         <LabelInputContainer className="mb-8">
           <Label htmlFor="password">Confirm Password</Label>
-          <Input id="password" placeholder="••••••••" type="password"  minLength={6}/>
+          <Input
+            id="password"
+            placeholder="••••••••"
+            type="password"
+            minLength={6}
+            value={user.confirmpassword}
+            onChange={(e) =>
+              setuser({ ...user, confirmpassword: e.target.value })
+            }
+          />
         </LabelInputContainer>
 
         <button
+          disabled={buttonDisabled}
+          onClick={login}
           className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
           type="submit"
         >
-          Login In &rarr;
+          {buttonDisabled ? "Submitting..." : `Login -->`}
           <BottomGradient />
         </button>
 
