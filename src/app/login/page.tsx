@@ -23,7 +23,7 @@ const LoginPage: React.FC = () => {
 
   const router = useRouter();
   const [user, setUser] = useState({
-    userCred: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
@@ -50,7 +50,10 @@ const LoginPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user.password === user.confirmPassword && user.confirmPassword.length > 0) {
+    if (
+      user.password === user.confirmPassword &&
+      user.confirmPassword.length > 0
+    ) {
       setPasswordError(false);
     } else {
       setPasswordError(true);
@@ -59,7 +62,7 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (
-      user.userCred.length > 0 &&
+      user.email.length > 0 &&
       user.password.length > 0 &&
       user.confirmPassword.length > 0
     ) {
@@ -70,12 +73,12 @@ const LoginPage: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    if (user.userCred.includes("@")) {
+    if (user.email.includes("@")) {
       setType(true);
     } else {
       setType(false);
     }
-  }, [user.userCred]);
+  }, [user.email]);
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
@@ -88,21 +91,23 @@ const LoginPage: React.FC = () => {
       {"\n"}
       {"\n"}
       <p className="text-3xl">{loading ? "Processing....." : ""}</p>
-      <p className="text-3xl">
-        {passwordError ? "Passwords must match" : ""}
-      </p>
+      <p className="text-3xl">{passwordError ? "Passwords must match" : ""}</p>
 
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
-          <Label htmlFor={type ? "email" : "username"}>
+          <Label
+            htmlFor="text"
+            // htmlFor={type ? "email" : "username"}
+          >
             Email Address or Username
           </Label>
           <Input
             id="email"
             placeholder="yourmail@address.com or Username"
-            type={type ? "email" : "text"}
-            value={user.userCred}
-            onChange={(e) => setUser({ ...user, userCred: e.target.value })}
+            // type={type ? "email" : "text"}
+            type="text"
+            value={user.email}
+            onChange={(e) => setUser({ ...user, email: e.target.value })}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
@@ -132,7 +137,9 @@ const LoginPage: React.FC = () => {
 
         <button
           disabled={buttonDisabled}
-          className={`bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] ${buttonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] ${
+            buttonDisabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           type="submit"
         >
           {loading ? "Submitting..." : `Login -->`}

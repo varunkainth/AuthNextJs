@@ -8,24 +8,24 @@ connect();
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, password, email } = await req.json();
+    console.log("Content-Type:", req.headers.get("Content-Type"));
+    console.log("Request method:", req.method);
+    const reqBody = await req.json();
+    const { email, password } = reqBody;
+    console.log(reqBody);
+    console.log(email);
+    console.log(password);
 
-    if (!username && !email) {
+    if (!email) {
       return NextResponse.json({
-        error: "Enter at least username or email address",
+        error: "Enter an email address",
       });
     }
     if (!password) {
       return NextResponse.json({ error: "Enter the password" });
     }
 
-    let user;
-
-    if (email) {
-      user = await User.findOne({ email });
-    } else {
-      user = await User.findOne({ username });
-    }
+    const user = await User.findOne({ email });
 
     if (!user) {
       throw new Error("User not found");
@@ -40,17 +40,27 @@ export async function POST(req: NextRequest) {
       id: user._id,
       email: user.email,
     };
+    console.log("Token data:", tokenData);
 
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
-      expiresIn: process.env.TOKEN_EXPIRY,
+      expiresIn: process.env.TOKEN_EXPIRY!,
     });
+    if (!token) {
+      console.log("no token is generated");
+    }
+    console.log("Generated token:", token);
 
     const response = NextResponse.json(
       { message: "User logged in successfully", user },
       { status: 200 }
     );
-
-    response.cookies.set("token", token, { httpOnly: true, secure: true });
+    console.log(token);
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
     return response;
   } catch (error) {
