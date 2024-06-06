@@ -8,6 +8,30 @@ export const sendemail = async ({ email, emailType, userId }: any) => {
     let subject, html, action;
 
     switch (emailType) {
+      case "changepassword":
+        subject = "Password Change Successfully";
+        html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Email Template</title>
+          <style>
+            /* Your CSS styles here */
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>Password Change Successfully</h1>
+            <p>Thank you for joining us. We're excited to have you on board!</p>
+            <p>Click the button below to get started.</p>
+            <a href="${process.env.DOMAIN}/login" class="button">Get Started</a>
+          </div>
+        </body>
+        </html>
+      `;
+        break;
       case "welcome":
         subject = "Welcome to Our Platform!";
         html = `
@@ -26,7 +50,7 @@ export const sendemail = async ({ email, emailType, userId }: any) => {
             <h1>Welcome to Our Platform!</h1>
             <p>Thank you for joining us. We're excited to have you on board!</p>
             <p>Click the button below to get started.</p>
-            <a href="#" class="button">Get Started</a>
+            <a href="${process.env.DOMAIN}/" class="button">Get Started</a>
           </div>
         </body>
         </html>

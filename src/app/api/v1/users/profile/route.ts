@@ -10,10 +10,11 @@ export async function GET(req: NextRequest) {
     const userid = await DataFromToken(req);
     const user = await User.findById(userid).select("-password");
     if (!user) {
-      return NextResponse.json({ error: "User not found" });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    return NextResponse.json({ messageL: "User Found", data: user });
+    return NextResponse.json({ message: "User Found", data: user });
   } catch (error) {
-    return NextResponse.json({ error: error }, { status: 500 });
+    console.error("Error fetching user:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

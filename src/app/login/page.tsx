@@ -16,54 +16,56 @@ import { useRouter } from "next/navigation";
 const LoginPage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted");
+    if (!passwordError && !buttonDisabled) {
+      login();
+    }
   };
 
   const router = useRouter();
-  const [user, setuser] = useState({
+  const [user, setUser] = useState({
     userCred: "",
     password: "",
-    confirmpassword: "",
+    confirmPassword: "",
   });
 
-  const [passwordError, setpasswordError] = useState(false);
-  const [Type, setType] = useState(true);
-  const [buttonDisabled, setbuttonDisabled] = useState(false);
-  const [loading, setloading] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const [type, setType] = useState(true);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const login = async () => {
     try {
-      setloading(true);
+      setLoading(true);
       const res = await axios.post("/api/v1/users/login", user);
       console.log("Login Successfully ", res);
-      toast.success("Login Sucessfully");
+      toast.success("Login Successfully");
       router.push("/profile");
     } catch (error: any) {
       toast.error("Login Failed");
       toast.error(error.message);
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+
   useEffect(() => {
-    if (
-      user.password === user.confirmpassword &&
-      user.confirmpassword.length === user.password.length
-    ) {
-      setpasswordError(false);
+    if (user.password === user.confirmPassword && user.confirmPassword.length > 0) {
+      setPasswordError(false);
     } else {
-      setpasswordError(true);
+      setPasswordError(true);
     }
-  }, [user.password]);
+  }, [user.password, user.confirmPassword]);
 
   useEffect(() => {
     if (
       user.userCred.length > 0 &&
       user.password.length > 0 &&
-      user.confirmpassword.length > 0
+      user.confirmPassword.length > 0
     ) {
-      setbuttonDisabled(false);
+      setButtonDisabled(false);
     } else {
-      setbuttonDisabled(true);
+      setButtonDisabled(true);
     }
   }, [user]);
 
@@ -87,30 +89,20 @@ const LoginPage: React.FC = () => {
       {"\n"}
       <p className="text-3xl">{loading ? "Processing....." : ""}</p>
       <p className="text-3xl">
-        {passwordError ? "Password must be same...." : ""}
+        {passwordError ? "Passwords must match" : ""}
       </p>
 
       <form className="my-8" onSubmit={handleSubmit}>
-        {/* <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-          <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
-            <Input id="firstname" placeholder="Tyler" type="text" />
-          </LabelInputContainer>
-          <LabelInputContainer>
-            <Label htmlFor="lastname">Last name</Label>
-            <Input id="lastname" placeholder="Durden" type="text" />
-          </LabelInputContainer>
-        </div> */}
         <LabelInputContainer className="mb-4">
-          <Label htmlFor={Type ? "email" : "username"}>
+          <Label htmlFor={type ? "email" : "username"}>
             Email Address or Username
           </Label>
           <Input
             id="email"
             placeholder="yourmail@address.com or Username"
-            type={Type ? "email" : "text"}
+            type={type ? "email" : "text"}
             value={user.userCred}
-            onChange={(e) => setuser({ ...user, userCred: e.target.value })}
+            onChange={(e) => setUser({ ...user, userCred: e.target.value })}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
@@ -121,30 +113,29 @@ const LoginPage: React.FC = () => {
             type="password"
             minLength={6}
             value={user.password}
-            onChange={(e) => setuser({ ...user, password: e.target.value })}
+            onChange={(e) => setUser({ ...user, password: e.target.value })}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-8">
-          <Label htmlFor="password">Confirm Password</Label>
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
           <Input
-            id="password"
+            id="confirmPassword"
             placeholder="••••••••"
             type="password"
             minLength={6}
-            value={user.confirmpassword}
+            value={user.confirmPassword}
             onChange={(e) =>
-              setuser({ ...user, confirmpassword: e.target.value })
+              setUser({ ...user, confirmPassword: e.target.value })
             }
           />
         </LabelInputContainer>
 
         <button
           disabled={buttonDisabled}
-          onClick={login}
-          className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
+          className={`bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] ${buttonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           type="submit"
         >
-          {buttonDisabled ? "Submitting..." : `Login -->`}
+          {loading ? "Submitting..." : `Login -->`}
           <BottomGradient />
         </button>
 
