@@ -28,7 +28,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/db/dbconnect.ts"
+    "src/db/dbconnect.ts",
+    "src/middleware.ts"
   ],
   "exclude": ["node_modules"]
 }
