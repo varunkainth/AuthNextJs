@@ -38,5 +38,4 @@ next-env.d.ts
 
 #enviourment varibales
 .env
-.env*
 *.env
