@@ -18,8 +18,7 @@ export async function POST(req: NextRequest) {
     if (!newPassword) {
       throw new Error("No new password provided");
     }
-
-    // Find the user by the reset token
+    
     const user = await User.findOne({
       resettoken: token,
       resettokenexpiry: { $gt: Date.now() },

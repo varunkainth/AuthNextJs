@@ -127,13 +127,13 @@ export const sendemail = async ({ email, emailType, userId }: any) => {
       default:
         throw new Error("Invalid email type");
     }
-
     const transport = nodemailer.createTransport({
-      host: "sandbox.smtp.mailtrap.io",
-      port: 2525,
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT!), // Ensure the port is a number
+      secure: process.env.SMTP_SECURE === "true", // Convert string to boolean
       auth: {
-        user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASSWORD,
+        user: process.env.SMTP_USERNAME,
+        pass: process.env.SMTP_PASSWORD,
       },
     });
 
