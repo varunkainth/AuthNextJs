@@ -1,12 +1,19 @@
 import jwt from "jsonwebtoken";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const DataFromToken = (req: NextRequest) => {
+export const dataFromToken = (req: NextRequest) => {
   try {
-    const token = req.cookies.get("token")?.value || "";
-    const decodeToken: any = jwt.verify(token, process.env.TOKEN_SECRET!);
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      throw new Error("Token not found");
+    }
+
+    const decodeToken = jwt.verify(token, process.env.TOKEN_SECRET!) as {
+      id: string;
+    };
     return decodeToken.id;
-  } catch (error: any) {
-    throw new Error(error);
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    // Return null or handle the error as needed
   }
 };

@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 connect();
 
 export async function POST(req: NextRequest) {
+
+  
   try {
     const reqBody = await req.json();
     const { token } = reqBody;

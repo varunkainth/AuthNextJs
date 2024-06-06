@@ -1,50 +1,55 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 
-const ProfilePage: React.FC = () => {
-  const [user, setUser] = useState({ username: "", email: "" });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+export default function ProfilePage() {
   const router = useRouter();
+  const [data, setData] = useState("nothing");
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get("/api/v1/users/profile");
-        setUser(response.data);
-        console.log(response.data);
-        setLoading(false);
-      } catch (error) {
-        setError(true);
-        setLoading(false);
-        console.log(error);
-      }
-    };
+  const getuserDetails = async () => {
+    const res = await axios.get("/api/v1/users/profile");
+    console.log(res.data.data);
+    setData(res.data.data);
+  };
 
-    fetchUserProfile();
-  }, []);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error loading profile. Please try again later.</div>;
-  }
-
+  const logout = async () => {
+    try {
+      await axios.get("/api/v1/users/logout");
+      toast.success("logout Success");
+      router.push("/login");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.messgae);
+    }
+  };
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-4xl">Profile Page</h1>
-      <div className="mt-8 p-4 bg-white shadow-md rounded-lg">
-        <h2 className="text-2xl font-bold">Welcome, {user.username}!</h2>
-        <p className="mt-4">Username: {user.username}</p>
-        <p>Email: {user.email}</p>
-      </div>
+      <h1>ProfilePage</h1>
+      <hr />
+      <h2>
+        {data === "nothing" ? (
+          "No data for display"
+        ) : (
+          <Link href={`/profile/${data}`}>{data}</Link>
+        )}
+      </h2>
+      <button
+        className="bg-blue-500 mt-4 hover:bg-blue-700 text-white font-bold py-2 rounded"
+        type="submit"
+        onClick={getuserDetails}
+      >
+        Get User Details
+      </button>
+      <button
+        className="bg-red-500 mt-4 hover:bg-red-700 text-white font-bold py-2 rounded"
+        type="submit"
+        onClick={logout}
+      >
+        Logout
+      </button>
     </div>
   );
-};
-
-export default ProfilePage;
+}
