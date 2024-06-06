@@ -130,7 +130,6 @@ export const sendemail = async ({ email, emailType, userId }: any) => {
     const transport = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT!), // Ensure the port is a number
-      secure: process.env.SMTP_SECURE === "true", // Convert string to boolean
       auth: {
         user: process.env.SMTP_USERNAME,
         pass: process.env.SMTP_PASSWORD,

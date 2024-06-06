@@ -8,6 +8,8 @@ import {
   IconBrandGithub,
   IconBrandGoogle,
   IconBrandOnlyfans,
+  IconEye,
+  IconEyeOff,
 } from "@tabler/icons-react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -27,6 +29,20 @@ const RegisterPage: React.FC = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+
+  const loginuproute = () => {
+    router.push("/login");
+  };
+
+  const checkPasswordsMatch = () => {
+    return user.password === user.confirmPassword;
+  };
+
+  useEffect(() => {
+    setPasswordError(!checkPasswordsMatch());
+  }, [user.password, user.confirmPassword]);
 
   const onSignUp = async () => {
     try {
@@ -50,26 +66,27 @@ const RegisterPage: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    if (user.password === user.confirmPassword && user.confirmPassword.length > 0) {
-      setPasswordError(false);
-    } else {
-      setPasswordError(true);
-    }
-  }, [user.password, user.confirmPassword]);
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmPasswordVisible(!confirmPasswordVisible);
+  };
 
   useEffect(() => {
     if (
       user.email.length > 0 &&
       user.password.length > 0 &&
       user.confirmPassword.length > 0 &&
-      user.username.length > 0
+      user.username.length > 0 &&
+      checkPasswordsMatch()
     ) {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
     }
-  }, [user]);
+  }, [user,passwordError]);
 
   return (
     <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black">
@@ -105,43 +122,68 @@ const RegisterPage: React.FC = () => {
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            placeholder="••••••••"
-            type="password"
-            minLength={6}
-            value={user.password}
-            onChange={(e) => setUser({ ...user, password: e.target.value })}
-          />
+          <div className="relative">
+            <Input
+              id="password"
+              placeholder="••••••••"
+              type={passwordVisible ? "text" : "password"}
+              minLength={6}
+              value={user.password}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              onClick={togglePasswordVisibility}
+            >
+              {passwordVisible ? <IconEyeOff /> : <IconEye />}
+            </button>
+          </div>
         </LabelInputContainer>
         <LabelInputContainer className="mb-8">
           <Label htmlFor="confirmPassword">Confirm Password</Label>
-          <Input
-            id="confirmPassword"
-            placeholder="••••••••"
-            type="password"
-            minLength={6}
-            value={user.confirmPassword}
-            onChange={(e) =>
-              setUser({ ...user, confirmPassword: e.target.value })
-            }
-          />
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              placeholder="••••••••"
+              type={confirmPasswordVisible ? "text" : "password"}
+              minLength={6}
+              value={user.confirmPassword}
+              onChange={(e) =>
+                setUser({ ...user, confirmPassword: e.target.value })
+              }
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2"
+              onClick={toggleConfirmPasswordVisibility}
+            >
+              {confirmPasswordVisible ? <IconEyeOff /> : <IconEye />}
+            </button>
+          </div>
         </LabelInputContainer>
 
         <button
           disabled={buttonDisabled}
-          className={`bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] ${buttonDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] ${
+            buttonDisabled ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           type="submit"
         >
-          {loading ? "Submitting..." : "Sign up -->"} 
+          {loading ? "Submitting..." : "Sign up -->"}
           <BottomGradient />
         </button>
 
-        <p>
-          Visit <Link href="/login">Login Page</Link>
-        </p>
+        <div className="mt-4"></div>
+        <button
+          onClick={loginuproute}
+          className={`bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset] `}
+          type="submit"
+        >
+          Login &rarr;
+          <BottomGradient />
+        </button>
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
       </form>
     </div>
   );
